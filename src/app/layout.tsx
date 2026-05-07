@@ -1,19 +1,19 @@
 import type { Metadata } from "next"
-import localFont from 'next/font/local'
+// import localFont from 'next/font/local'
 import "./globals.css"
  
 
-const geistSans = localFont({
-  src: [
-    {
-      path: '../../public/fonts/Geist/gyByhwUxId8gMEwcGFU.woff2',
-      weight: '100 900',
-      style: 'normal',
-    },
-  ],
-  variable: '--font-geist-sans',
-  display: 'swap',
-})
+// const geistSans = localFont({
+//   src: [
+//     {
+//       path: '../../public/fonts/Geist/gyByhwUxId8gMEwcGFU.woff2',
+//       weight: '100 900',
+//       style: 'normal',
+//     },
+//   ],
+//   variable: '--font-geist-sans',
+//   display: 'swap',
+// })
 
 // const geistMono = Geist_Mono({
 //   variable: "--font-geist-mono",
@@ -33,7 +33,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable}   h-full antialiased`}
+      className={`h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
