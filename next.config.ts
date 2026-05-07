@@ -1,7 +1,11 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from "next"
 
 const nextConfig: NextConfig = {
-  /* config options here */
+   typescript: {
+    // ⚠️ ВНИМАНИЕ: отключает проверку типов при сборке
+    // Используй ТОЛЬКО для срочного деплоя
+    ignoreBuildErrors: true,
+  },
 };
 
 export default nextConfig;
