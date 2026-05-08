@@ -1,5 +1,6 @@
-'use client';
+'use client'
 import { useEffect, useRef, useState } from "react"
+
 
 /* ─── COLORS ─────────────────────────────────────────────── */
 const C = {
@@ -54,26 +55,21 @@ const GLOBAL_CSS = `
     from { transform: translateX(0); }
     to   { transform: translateX(-50%); }
   }
-		  /* 🔥 НОВЫЕ АНИМАЦИИ */
+  @keyframes letterDrop {
+    from { opacity: 0; transform: translateY(-24px) rotate(-4deg); }
+    to   { opacity: 1; transform: translateY(0) rotate(0deg); }
+  }
+  @keyframes floatDot {
+    0%,100% { top: 30%; } 50% { top: 65%; }
+  }
+  @keyframes scrollLine {
+    0%   { opacity: 0; transform: scaleY(0); transform-origin: top; }
+    50%  { opacity: 1; transform: scaleY(1); transform-origin: top; }
+    100% { opacity: 0; transform: scaleY(1); transform-origin: bottom; }
+  }
   @keyframes ringOrbit {
     from { transform: rotate(0deg); }
     to   { transform: rotate(360deg); }
-  }
-  
-  @keyframes scrollLine {
-    0%   { transform: translateY(0); opacity: 0.2; }
-    50%  { transform: translateY(20px); opacity: 1; }
-    100% { transform: translateY(40px); opacity: 0; }
-  }
-  
-  @keyframes letterDrop {
-    0%   { opacity: 0; transform: translateY(-30px) rotateX(-90deg); }
-    100% { opacity: 1; transform: translateY(0) rotateX(0); }
-  }
-  
-  @keyframes floatDot {
-    0%,100% { transform: translateY(0); opacity: 0.6; }
-    50%     { transform: translateY(-15px); opacity: 1; }
   }
 
   .reveal {
@@ -126,6 +122,7 @@ const GLOBAL_CSS = `
     .sec { padding: 64px 20px !important; }
     .sec-h2 { font-size: 30px !important; letter-spacing: -0.5px !important; }
     .dir-grid { grid-template-columns: 1fr !important; }
+    .gal-grid { grid-template-columns: repeat(2,1fr) !important; }
     .sch-grid { grid-template-columns: 1fr !important; }
     .tea-grid { flex-direction: column !important; align-items: center !important; }
     .pri-grid { flex-direction: column !important; align-items: center !important; }
@@ -144,18 +141,21 @@ const GLOBAL_CSS = `
   }
   @media (min-width: 769px) and (max-width: 1100px) {
     .dir-grid { grid-template-columns: repeat(2, 1fr) !important; }
+    .gal-grid { grid-template-columns: repeat(3,1fr) !important; }
     .sec { padding: 80px 32px !important; }
   }
 `;
 
 /* ─── DATA ────────────────────────────────────────────────── */
 const DIRECTIONS = [
-  { id:1, name:"High Heels",      emoji:"👠", desc:"Сексуальная пластика и уверенная походка на каблуках. Раскрой женственность в движении.", schedule:"Пн, Ср 19:00", price:"от 1 200 ₽", color:"#ff5ba7", age:"16+" },
-  { id:2, name:"Pro Heels",       emoji:"✨", desc:"Продвинутый уровень. Сложные связки, хореография, работа с образом.", schedule:"Вт, Чт 20:00", price:"от 1 400 ₽", color:"#b06aff", age:"18+" },
-  { id:3, name:"Street Dance",    emoji:"🔥", desc:"Хип-хоп, уличный стиль, свобода движений. Для тех, кто хочет драйва.", schedule:"Пн, Пт 18:00", price:"от 1 000 ₽", color:"#ff7c3b", age:"12+" },
-  { id:4, name:"Belly Dance",     emoji:"🌙", desc:"Восточные танцы — пластика, грация, работа с бёдрами и животом.", schedule:"Ср, Сб 11:00", price:"от 1 100 ₽", color:"#f0c040", age:"14+" },
-  { id:5, name:"Балет",           emoji:"🩰", desc:"Классическая школа, растяжка, осанка и элегантность для всех.", schedule:"Вт, Сб 10:00", price:"от 1 300 ₽", color:"#5bc8ff", age:"5+"  },
-  { id:6, name:"Свадебный танец", emoji:"💍", desc:"Индивидуальная постановка для пары. Создадим незабываемый момент.", schedule:"По записи",  price:"от 3 000 ₽", color:"#ff5ba7", age:"Пары"},
+  { id:1, name:"High Heels",           emoji:"👠", desc:"Сексуальная пластика и уверенная походка на каблуках. Раскрой женственность в движении.", schedule:"Ср 17:30 · Сб 10:30 · Вс 13:00", price:"Уточняйте у администратора", color:"#ff5ba7", age:"16+", img:"img1" },
+  { id:2, name:"Pro Heels",            emoji:"✨", desc:"Продвинутый уровень. Сложные связки, хореография, работа с образом.", schedule:"Пн 19:00 · Чт 19:00 · Сб 17:00", price:"Уточняйте у администратора", color:"#b06aff", age:"18+", img:"img2" },
+  { id:3, name:"Street Dance",         emoji:"🔥", desc:"Взрослые: Вт/Пт 19:00. Детская группа: Вт/Чт 17:30, Вс 16:00. Чистый уличный драйв.", schedule:"Вт 19:00 · Пт 19:00", price:"Уточняйте у администратора", color:"#ff7c3b", age:"6+", img:"img3" },
+  { id:4, name:"Belly Dance",          emoji:"🌙", desc:"Восточные танцы — пластика, грация, работа с бёдрами и животом.", schedule:"Вт 14:30 · Чт 19:00 · Сб 12:00", price:"Уточняйте у администратора", color:"#f0c040", age:"14+", img:"img4" },
+  { id:5, name:"Балет",                emoji:"🩰", desc:"Классическая школа, растяжка, осанка и элегантность для всех.", schedule:"Ср 19:00 · Вс 14:30", price:"Уточняйте у администратора", color:"#5bc8ff", age:"5+", img:"img5"  },
+  { id:6, name:"Salsation",            emoji:"💃", desc:"Танцевальный фитнес на основе латинских ритмов. Сжигай калории с удовольствием!", schedule:"Пт 17:30 · Вс 11:00", price:"Уточняйте у администратора", color:"#ff7c3b", age:"Все", img:"img6" },
+ { id:7, name:"Детский танец", emoji:"🧸", desc:"Развитие координации, чувства ритма и творческих способностей. Весёлые занятия в игровой форме.", schedule:"Ср 16:00 · Сб 11:00", price:"Уточняйте у администратора", color:"#5bc8ff", age:"3-10 лет", img:"img7" },
+  { id:8, name:"Фитнес-аэробика",      emoji:"🏋️", desc:"Фитнес-аэробика с фитболом — энергичные тренировки для тонуса и здоровья.", schedule:"Пн 17:30", price:"Уточняйте у администратора", color:"#5bc8ff", age:"Все", img:"img8" },
 ];
 
 const TEACHERS = [
@@ -165,12 +165,13 @@ const TEACHERS = [
 ];
 
 const SCHEDULE = [
-  { day:"Понедельник", items:[{ time:"18:00", dir:"Street Dance", teacher:"Дарья К.",    color:"#ff7c3b" },{ time:"19:00", dir:"High Heels",  teacher:"Анастасия В.", color:"#ff5ba7" }] },
-  { day:"Вторник",     items:[{ time:"10:00", dir:"Балет",        teacher:"Мария О.",    color:"#5bc8ff" },{ time:"20:00", dir:"Pro Heels",   teacher:"Анастасия В.", color:"#b06aff" }] },
-  { day:"Среда",       items:[{ time:"11:00", dir:"Belly Dance",  teacher:"Мария О.",    color:"#f0c040" },{ time:"19:00", dir:"High Heels",  teacher:"Анастасия В.", color:"#ff5ba7" }] },
-  { day:"Четверг",     items:[{ time:"20:00", dir:"Pro Heels",    teacher:"Анастасия В.",color:"#b06aff" }] },
-  { day:"Пятница",     items:[{ time:"18:00", dir:"Street Dance", teacher:"Дарья К.",    color:"#ff7c3b" }] },
-  { day:"Суббота",     items:[{ time:"10:00", dir:"Балет",        teacher:"Мария О.",    color:"#5bc8ff" },{ time:"11:00", dir:"Belly Dance", teacher:"Мария О.",    color:"#f0c040" }] },
+  { day:"Понедельник", items:[{ time:"17:30", dir:"Фитнес-аэробика", teacher:"", color:"#5bc8ff" },{ time:"19:00", dir:"Pro Heels", teacher:"", color:"#b06aff" }] },
+  { day:"Вторник",     items:[{ time:"14:30", dir:"Belly Dance", teacher:"", color:"#f0c040" },{ time:"17:30", dir:"Street Dance (дети)", teacher:"", color:"#ff7c3b" },{ time:"19:00", dir:"Street Dance (взр.)", teacher:"", color:"#ff7c3b" }] },
+  { day:"Среда",       items:[{ time:"17:30", dir:"High Heels", teacher:"", color:"#ff5ba7" },{ time:"19:00", dir:"Балет", teacher:"", color:"#5bc8ff" }] },
+  { day:"Четверг",     items:[{ time:"17:30", dir:"Street Dance (дети)", teacher:"", color:"#ff7c3b" },{ time:"19:00", dir:"Belly Dance", teacher:"", color:"#f0c040" },{ time:"19:00", dir:"Pro Heels", teacher:"", color:"#b06aff" }] },
+  { day:"Пятница",     items:[{ time:"17:30", dir:"Salsation", teacher:"", color:"#ff7c3b" },{ time:"19:00", dir:"Street Dance (взр.)", teacher:"", color:"#ff7c3b" }] },
+  { day:"Суббота",     items:[{ time:"10:30", dir:"High Heels", teacher:"", color:"#ff5ba7" },{ time:"12:00", dir:"Belly Dance", teacher:"", color:"#f0c040" },{ time:"17:00", dir:"Pro Heels", teacher:"", color:"#b06aff" }] },
+  { day:"Воскресенье", items:[{ time:"11:00", dir:"Salsation", teacher:"", color:"#ff7c3b" },{ time:"13:00", dir:"High Heels", teacher:"", color:"#ff5ba7" },{ time:"14:30", dir:"Балет", teacher:"", color:"#5bc8ff" },{ time:"16:00", dir:"Street Dance (дети)", teacher:"", color:"#ff7c3b" }] },
 ];
 
 const REVIEWS = [
@@ -186,7 +187,19 @@ const PRICES = [
   { type:"Индивидуальное",       price:"3 000 ₽", note:"60 мин / 1 педагог" },
 ];
 
-const TICKER = ["High Heels","Street Dance","Belly Dance","Балет","Pro Heels","Свадебный танец"];
+const TICKER = ["High Heels","Street Dance","Belly Dance","Балет","Pro Heels","Свадебный танец","Salsation","Фитнес-аэробика"];
+ 
+const IMGS = {
+  img1: "/images/dance_1.webp",
+  img2: "/images/dance_2.webp",
+  img3: "/images/dance_3.webp",
+  img4: "/images/dance_4.webp",
+  img5: "/images/dance_5.webp",
+  img6: "/images/dance_6.webp",
+  img7: "/images/dance_7.webp",
+  img8: "/images/dance_8.webp"
+}
+
 
 /* ─── HOOKS ───────────────────────────────────────────────── */
 function useReveal() {
@@ -245,8 +258,8 @@ function Navbar({ onCTA }) {
         transition:"background 0.35s, border-color 0.35s",
       }}>
         <div style={{ display:"flex", alignItems:"center", gap:10 }}>
-          <span style={{ fontSize:22, fontWeight:800, letterSpacing:"-0.5px", background:`linear-gradient(90deg, ${C.purple}, ${C.pink})`, WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" }}>VIBE</span>
-          <span style={{ color:C.muted, fontSize:12, letterSpacing:3, textTransform:"uppercase", fontWeight:500 }}>Dance Studio</span>
+          <span style={{ fontSize:22, fontWeight:800, letterSpacing:"-0.5px", background:`linear-gradient(90deg, ${C.purple}, ${C.pink})`, WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" }}>ДОМ ТАНЦА</span>
+          <span style={{ color:C.muted, fontSize:12, letterSpacing:2, textTransform:"uppercase", fontWeight:500 }}>Новошахтинск</span>
         </div>
         <div className="nav-links" style={{ display:"flex", gap:32 }}>
           {links.map(l => <a key={l} className="nav-a" href={`#${l.toLowerCase()}`}>{l}</a>)}
@@ -599,7 +612,7 @@ function Directions({ onCTA }) {
   return (
     <section id="направления" className="sec" style={{ padding:"100px 40px" }}>
       <SecHead tag="Направления" title="Найди своё направление" sub="Каждое занятие — шаг к лучшей версии себя" />
-      <div className="dir-grid" style={{ display:"grid", gridTemplateColumns:"repeat(3, 1fr)", gap:22, maxWidth:1100, margin:"0 auto" }}>
+      <div className="dir-grid" style={{ display:"grid", gridTemplateColumns:"repeat(4, 1fr)", gap:20, maxWidth:1200, margin:"0 auto" }}>
         {DIRECTIONS.map((d, i) => (
           <div key={d.id} ref={el => refs.current[i] = el} className="reveal card-lift"
             onMouseEnter={() => setHov(d.id)} onMouseLeave={() => setHov(null)}
@@ -611,10 +624,19 @@ function Directions({ onCTA }) {
               transform: hov===d.id ? "translateY(-6px)" : "none",
               cursor:"pointer",
             }}>
-            <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:16 }}>
-              <span style={{ fontSize:34, display:"block", transition:"transform 0.3s", transform: hov===d.id ? "scale(1.2) rotate(-6deg)" : "none" }}>{d.emoji}</span>
-              <span style={{ background:`${d.color}18`, border:`1px solid ${d.color}40`, color:d.color, borderRadius:100, fontSize:12, fontWeight:700, padding:"4px 12px" }}>{d.age}</span>
-            </div>
+            {d.img && IMGS[d.img] && (
+              <div style={{ borderRadius:12, overflow:"hidden", marginBottom:16, aspectRatio:"16/9", position:"relative" }}>
+                <img src={IMGS[d.img]} alt={d.name} style={{ width:"100%", height:"100%", objectFit:"cover", transition:"transform 0.4s", transform: hov===d.id ? "scale(1.06)" : "scale(1)" }} />
+                <span style={{ position:"absolute", top:10, right:10, background:`${d.color}cc`, border:`1px solid ${d.color}`, color:"#fff", borderRadius:100, fontSize:11, fontWeight:700, padding:"3px 10px" }}>{d.age}</span>
+                <span style={{ position:"absolute", top:10, left:10, fontSize:22, filter:"drop-shadow(0 2px 4px rgba(0,0,0,0.5))" }}>{d.emoji}</span>
+              </div>
+            )}
+            {!d.img && (
+              <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:16 }}>
+                <span style={{ fontSize:34 }}>{d.emoji}</span>
+                <span style={{ background:`${d.color}18`, border:`1px solid ${d.color}40`, color:d.color, borderRadius:100, fontSize:12, fontWeight:700, padding:"4px 12px" }}>{d.age}</span>
+              </div>
+            )}
             <h3 style={{ fontSize:21, fontWeight:800, color:C.text, marginBottom:10 }}>{d.name}</h3>
             <p style={{ color:C.muted, fontSize:14, lineHeight:1.65, marginBottom:20 }}>{d.desc}</p>
             <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", paddingTop:16, borderTop:`1px solid ${C.border}` }}>
@@ -760,6 +782,49 @@ function Prices({ onCTA }) {
   );
 }
 
+
+/* GALLERY */
+function Gallery() {
+  const [active, setActive] = useState(null);
+  const refs = useStagger(8);
+  const all = Object.entries(IMGS);
+  return (
+    <section className="sec" style={{ padding:"100px 40px", background:"linear-gradient(180deg, transparent, rgba(176,106,255,0.04), transparent)" }}>
+      <SecHead tag="Галерея" title="Наша студия в жизни" sub="Моменты, которые вдохновляют" />
+      <div className="gal-grid" style={{ display:"grid", gridTemplateColumns:"repeat(4, 1fr)", gap:14, maxWidth:1100, margin:"0 auto" }}>
+        {all.map(([key, src], i) => (
+          <div key={key} ref={el => refs.current[i] = el} className="reveal"
+            onClick={() => setActive(src)}
+            style={{
+              borderRadius:16, 
+              overflow:"hidden", 
+              cursor:"pointer",
+              aspectRatio: "1/1", // 👈 ВСЕ КАРТИНКИ КВАДРАТНЫЕ (1:1)
+              position:"relative",
+              transition:"transform 0.3s, box-shadow 0.3s",
+            }}
+            onMouseEnter={e => { e.currentTarget.style.transform = "scale(1.03)"; e.currentTarget.style.boxShadow = `0 12px 40px rgba(176,106,255,0.3)`; }}
+            onMouseLeave={e => { e.currentTarget.style.transform = "none"; e.currentTarget.style.boxShadow = "none"; }}
+          >
+            <img src={src} alt="" style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }} />
+            <div style={{ position:"absolute", inset:0, background:"linear-gradient(180deg, transparent 50%, rgba(10,10,15,0.6))", opacity:0, transition:"opacity 0.3s" }}
+              onMouseEnter={e => e.currentTarget.style.opacity = 1}
+              onMouseLeave={e => e.currentTarget.style.opacity = 0}
+            />
+          </div>
+        ))}
+      </div>
+      {/* Lightbox */}
+      {active && (
+        <div onClick={() => setActive(null)} style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.92)", zIndex:400, display:"flex", alignItems:"center", justifyContent:"center", padding:20, animation:"overlayIn 0.2s ease", cursor:"pointer" }}>
+          <img src={active} alt="" style={{ maxWidth:"90vw", maxHeight:"88vh", borderRadius:16, objectFit:"contain", animation:"modalIn 0.25s ease" }} />
+          <button onClick={() => setActive(null)} style={{ position:"fixed", top:24, right:24, background:"rgba(255,255,255,0.1)", border:"none", color:"#fff", borderRadius:"50%", width:44, height:44, fontSize:20, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center" }}>✕</button>
+        </div>
+      )}
+    </section>
+  );
+}
+
 /* REVIEWS */
 function Reviews() {
   const refs = useStagger(REVIEWS.length);
@@ -804,11 +869,11 @@ function CTASection({ onCTA }) {
       }}>
         <div style={{ position:"absolute", top:-60, right:-60, width:200, height:200, borderRadius:"50%", background:`radial-gradient(ellipse, rgba(176,106,255,0.25) 0%, transparent 70%)`, animation:"pulse 5s ease-in-out infinite", pointerEvents:"none" }} />
         <div style={{ position:"absolute", bottom:-40, left:-40, width:160, height:160, borderRadius:"50%", background:`radial-gradient(ellipse, rgba(255,91,167,0.18) 0%, transparent 70%)`, animation:"pulse 7s ease-in-out infinite 2s", pointerEvents:"none" }} />
-        <h2 style={{ fontSize:"clamp(26px, 5vw, 44px)", fontWeight:900, color:C.text, letterSpacing:"-1.5px", marginBottom:16, position:"relative" }}>Попробуй бесплатно</h2>
-        <p style={{ color:C.muted, fontSize:"clamp(15px, 2.5vw, 18px)", marginBottom:36, maxWidth:420, margin:"0 auto 36px", position:"relative" }}>Запишись на первое пробное занятие и почувствуй разницу</p>
-        <button className="btn-grad" onClick={onCTA} style={{ fontSize:17, padding:"18px 48px", marginBottom:40, position:"relative" }}>Записаться сейчас</button>
+        <h2 style={{ fontSize:"clamp(26px, 5vw, 44px)", fontWeight:900, color:C.text, letterSpacing:"-1.5px", marginBottom:16, position:"relative" }}>Готовы начать?</h2>
+        <p style={{ color:C.muted, fontSize:"clamp(15px, 2.5vw, 18px)", marginBottom:36, maxWidth:460, margin:"0 auto 36px", position:"relative" }}>Запишитесь на занятие уже сейчас — мы подберём подходящее время и направление лично для вас</p>
+        <button className="btn-grad" onClick={onCTA} style={{ fontSize:17, padding:"18px 48px", marginBottom:40, position:"relative" }}>Записаться на занятие</button>
         <div style={{ display:"flex", gap:24, justifyContent:"center", flexWrap:"wrap", position:"relative" }}>
-          {[["📍","ул. Центральная 12, ТЦ Аврора"],["📞","+7 (900) 123-45-67"],["⏰","Пн-Вс 8:00 – 22:00"]].map(([icon,text]) => (
+          {[["📍","Новошахтинск, ул. Харьковская 195"],["📞","8 918 590-43-90"],["⏰","Пн-Вс — уточняйте расписание"]].map(([icon,text]) => (
             <div key={text} style={{ display:"flex", alignItems:"center", gap:8, color:C.muted, fontSize:14 }}>
               {icon} {text}
             </div>
@@ -825,8 +890,8 @@ function Footer() {
     <footer style={{ borderTop:`1px solid ${C.border}`, padding:"32px 40px" }}>
       <div className="footer-in" style={{ display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:16 }}>
         <div style={{ display:"flex", alignItems:"center", gap:8 }}>
-          <span style={{ fontSize:18, fontWeight:800, background:`linear-gradient(90deg,${C.purple},${C.pink})`, WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" }}>VIBE</span>
-          <span style={{ color:C.muted, fontSize:12 }}>Dance Studio © 2025</span>
+          <span style={{ fontSize:18, fontWeight:800, background:`linear-gradient(90deg,${C.purple},${C.pink})`, WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" }}>ДОМ ТАНЦА</span>
+          <span style={{ color:C.muted, fontSize:12 }}>Танцевальная студия © 2025</span>
         </div>
         <div style={{ display:"flex", gap:22, flexWrap:"wrap", justifyContent:"center" }}>
           {["VK","Telegram","WhatsApp","Instagram"].map(s => (
@@ -856,15 +921,15 @@ function LeadForm({ onClose }) {
     <div style={{ textAlign:"center", padding:"32px 0", animation:"fadeIn 0.4s ease" }}>
       <div style={{ fontSize:52, marginBottom:20, animation:"float 3s ease-in-out infinite" }}>🎉</div>
       <h3 style={{ fontSize:24, fontWeight:800, color:C.text, marginBottom:10 }}>Заявка отправлена!</h3>
-      <p style={{ color:C.muted, marginBottom:28 }}>Мы свяжемся с вами в течение 30 минут</p>
+      <p style={{ color:C.muted, marginBottom:28 }}>Наш администратор свяжется с вами в ближайшее время</p>
       <button className="btn-grad" onClick={onClose} style={{ fontSize:15, padding:"12px 32px" }}>Готово</button>
     </div>
   );
 
   return (
     <div>
-      <h3 style={{ fontSize:24, fontWeight:800, color:C.text, marginBottom:6 }}>Записаться на пробное</h3>
-      <p style={{ color:C.muted, fontSize:15, marginBottom:24 }}>Первое занятие бесплатно при записи сейчас</p>
+      <h3 style={{ fontSize:24, fontWeight:800, color:C.text, marginBottom:6 }}>Записаться на занятие</h3>
+      <p style={{ color:C.muted, fontSize:15, marginBottom:24 }}>Оставьте заявку — мы свяжемся и подберём удобное время</p>
       <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
         <input type="text"  placeholder="Ваше имя"  value={form.name}   onChange={e => setForm({...form, name:e.target.value})} />
         <input type="tel"   placeholder="Телефон"    value={form.phone}  onChange={e => setForm({...form, phone:e.target.value})} />
@@ -923,6 +988,7 @@ export default function App() {
         <Schedule />
         <Teachers />
         <Prices onCTA={() => setModal(true)} />
+        <Gallery />
         <Reviews />
         <CTASection onCTA={() => setModal(true)} />
         <Footer />
